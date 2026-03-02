@@ -16,6 +16,7 @@
 - [Getting Started](#getting-started)
 - [Testing](#testing)
 - [Devnet Deployment](#devnet-deployment)
+- [CLI](#cli)
 - [Frontend (Visual Test Harness)](#frontend-visual-test-harness)
 - [Project Structure](#project-structure)
 
@@ -325,6 +326,38 @@ anchor deploy
 
 ---
 
+## CLI
+
+A graphical command-line interface for interacting with the RBAC program directly from your terminal. Designed for judges and developers to verify on-chain behavior without needing the frontend.
+
+### Quick Start
+
+```bash
+cd cli
+yarn install
+yarn build
+chmod +x dist/index.js   # Linux/macOS only
+npm link
+```
+
+### Key Commands
+
+```bash
+rbac-cli init                                          # Initialize RBAC system
+rbac-cli create-role doctor                            # Create a role
+rbac-cli create-permission read_medical med_record read # Create a permission
+rbac-cli assign-permission doctor read_medical          # Link perm → role
+rbac-cli assign-role <USER_PUBKEY> doctor               # Assign role → user
+rbac-cli check-access <USER_PUBKEY> doctor read_medical # Verify on-chain
+rbac-cli demo                                          # Full hospital demo
+```
+
+Every command prints the Solana Explorer transaction link for verification.
+
+> **Full documentation:** See [`cli/README.md`](cli/README.md) for all 15 commands, configuration options, and example workflows.
+
+---
+
 ## Frontend (Visual Test Harness)
 
 ### Why a Minimal Frontend Exists
@@ -413,6 +446,12 @@ rbac/
 │       └── remove_permission.rs      # Delete permission account
 ├── tests/
 │   └── rbac.ts                        # Comprehensive test suite (25+ cases)
+├── cli/                               # Command-line interface
+│   ├── src/
+│   │   ├── index.ts                   # CLI entry point (15 commands)
+│   │   └── helpers.ts                 # PDA derivation utilities
+│   ├── package.json
+│   └── README.md                      # Full CLI documentation
 ├── app/                               # React frontend (visual test harness)
 │   ├── src/
 │   │   ├── App.tsx                    # Main dashboard
