@@ -1,0 +1,1729 @@
+{
+    "address": "DKm6aeoBePLZNhYf14TVdQ2d3TUeWcd6nfnP8uruVgs9",
+    "metadata": {
+        "name": "rbac",
+        "version": "0.1.0",
+        "spec": "0.1.0",
+        "description": "Created with Anchor"
+    },
+    "instructions": [
+        {
+            "name": "assign_permission_to_role",
+            "docs": [
+                "Assign a permission to a role, creating the junction PDA.",
+                "Only callable by the super admin."
+            ],
+            "discriminator": [
+                118,
+                239,
+                224,
+                150,
+                110,
+                141,
+                96,
+                106
+            ],
+            "accounts": [
+                {
+                    "name": "rbac_state",
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [
+                                    114,
+                                    98,
+                                    97,
+                                    99,
+                                    95,
+                                    115,
+                                    116,
+                                    97,
+                                    116,
+                                    101
+                                ]
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "role",
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [
+                                    114,
+                                    111,
+                                    108,
+                                    101
+                                ]
+                            },
+                            {
+                                "kind": "account",
+                                "path": "role.name",
+                                "account": "Role"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "permission",
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [
+                                    112,
+                                    101,
+                                    114,
+                                    109,
+                                    105,
+                                    115,
+                                    115,
+                                    105,
+                                    111,
+                                    110
+                                ]
+                            },
+                            {
+                                "kind": "account",
+                                "path": "permission.name",
+                                "account": "Permission"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "role_permission",
+                    "writable": true,
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [
+                                    114,
+                                    111,
+                                    108,
+                                    101,
+                                    95,
+                                    112,
+                                    101,
+                                    114,
+                                    109,
+                                    105,
+                                    115,
+                                    115,
+                                    105,
+                                    111,
+                                    110
+                                ]
+                            },
+                            {
+                                "kind": "account",
+                                "path": "role"
+                            },
+                            {
+                                "kind": "account",
+                                "path": "permission"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "authority",
+                    "writable": true,
+                    "signer": true
+                },
+                {
+                    "name": "system_program",
+                    "address": "11111111111111111111111111111111"
+                }
+            ],
+            "args": []
+        },
+        {
+            "name": "assign_role_to_user",
+            "docs": [
+                "Assign a role to a user, creating the junction PDA.",
+                "Only callable by the super admin."
+            ],
+            "discriminator": [
+                209,
+                71,
+                156,
+                113,
+                179,
+                171,
+                92,
+                196
+            ],
+            "accounts": [
+                {
+                    "name": "rbac_state",
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [
+                                    114,
+                                    98,
+                                    97,
+                                    99,
+                                    95,
+                                    115,
+                                    116,
+                                    97,
+                                    116,
+                                    101
+                                ]
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "role",
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [
+                                    114,
+                                    111,
+                                    108,
+                                    101
+                                ]
+                            },
+                            {
+                                "kind": "account",
+                                "path": "role.name",
+                                "account": "Role"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "user",
+                    "docs": [
+                        "It does not need to sign — only the admin assigns roles."
+                    ]
+                },
+                {
+                    "name": "user_role",
+                    "writable": true,
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [
+                                    117,
+                                    115,
+                                    101,
+                                    114,
+                                    95,
+                                    114,
+                                    111,
+                                    108,
+                                    101
+                                ]
+                            },
+                            {
+                                "kind": "account",
+                                "path": "user"
+                            },
+                            {
+                                "kind": "account",
+                                "path": "role"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "authority",
+                    "writable": true,
+                    "signer": true
+                },
+                {
+                    "name": "system_program",
+                    "address": "11111111111111111111111111111111"
+                }
+            ],
+            "args": []
+        },
+        {
+            "name": "check_access",
+            "docs": [
+                "Check if a user has a specific permission through any of their roles.",
+                "This is a read-only instruction that validates the PDA chain:",
+                "user → UserRole → Role → RolePermission → Permission",
+                "If any link is missing, the transaction fails (access denied by construction).",
+                "Callable by anyone."
+            ],
+            "discriminator": [
+                74,
+                62,
+                42,
+                188,
+                96,
+                229,
+                63,
+                50
+            ],
+            "accounts": [
+                {
+                    "name": "user"
+                },
+                {
+                    "name": "role",
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [
+                                    114,
+                                    111,
+                                    108,
+                                    101
+                                ]
+                            },
+                            {
+                                "kind": "account",
+                                "path": "role.name",
+                                "account": "Role"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "permission",
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [
+                                    112,
+                                    101,
+                                    114,
+                                    109,
+                                    105,
+                                    115,
+                                    115,
+                                    105,
+                                    111,
+                                    110
+                                ]
+                            },
+                            {
+                                "kind": "account",
+                                "path": "permission.name",
+                                "account": "Permission"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "user_role",
+                    "docs": [
+                        "The UserRole junction — proves the user has this role."
+                    ],
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [
+                                    117,
+                                    115,
+                                    101,
+                                    114,
+                                    95,
+                                    114,
+                                    111,
+                                    108,
+                                    101
+                                ]
+                            },
+                            {
+                                "kind": "account",
+                                "path": "user"
+                            },
+                            {
+                                "kind": "account",
+                                "path": "role"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "role_permission",
+                    "docs": [
+                        "The RolePermission junction — proves the role has this permission."
+                    ],
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [
+                                    114,
+                                    111,
+                                    108,
+                                    101,
+                                    95,
+                                    112,
+                                    101,
+                                    114,
+                                    109,
+                                    105,
+                                    115,
+                                    115,
+                                    105,
+                                    111,
+                                    110
+                                ]
+                            },
+                            {
+                                "kind": "account",
+                                "path": "role"
+                            },
+                            {
+                                "kind": "account",
+                                "path": "permission"
+                            }
+                        ]
+                    }
+                }
+            ],
+            "args": []
+        },
+        {
+            "name": "create_permission",
+            "docs": [
+                "Create a new named permission (e.g. \"read_medical_record\").",
+                "Only callable by the super admin."
+            ],
+            "discriminator": [
+                190,
+                182,
+                26,
+                164,
+                156,
+                221,
+                8,
+                0
+            ],
+            "accounts": [
+                {
+                    "name": "rbac_state",
+                    "writable": true,
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [
+                                    114,
+                                    98,
+                                    97,
+                                    99,
+                                    95,
+                                    115,
+                                    116,
+                                    97,
+                                    116,
+                                    101
+                                ]
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "permission",
+                    "writable": true,
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [
+                                    112,
+                                    101,
+                                    114,
+                                    109,
+                                    105,
+                                    115,
+                                    115,
+                                    105,
+                                    111,
+                                    110
+                                ]
+                            },
+                            {
+                                "kind": "arg",
+                                "path": "name"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "authority",
+                    "writable": true,
+                    "signer": true
+                },
+                {
+                    "name": "system_program",
+                    "address": "11111111111111111111111111111111"
+                }
+            ],
+            "args": [
+                {
+                    "name": "name",
+                    "type": "string"
+                },
+                {
+                    "name": "resource",
+                    "type": "string"
+                },
+                {
+                    "name": "action",
+                    "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "create_role",
+            "docs": [
+                "Create a new named role (e.g. \"doctor\", \"nurse\").",
+                "Only callable by the super admin."
+            ],
+            "discriminator": [
+                170,
+                147,
+                127,
+                223,
+                222,
+                112,
+                205,
+                163
+            ],
+            "accounts": [
+                {
+                    "name": "rbac_state",
+                    "writable": true,
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [
+                                    114,
+                                    98,
+                                    97,
+                                    99,
+                                    95,
+                                    115,
+                                    116,
+                                    97,
+                                    116,
+                                    101
+                                ]
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "role",
+                    "writable": true,
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [
+                                    114,
+                                    111,
+                                    108,
+                                    101
+                                ]
+                            },
+                            {
+                                "kind": "arg",
+                                "path": "name"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "authority",
+                    "writable": true,
+                    "signer": true
+                },
+                {
+                    "name": "system_program",
+                    "address": "11111111111111111111111111111111"
+                }
+            ],
+            "args": [
+                {
+                    "name": "name",
+                    "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "initialize",
+            "docs": [
+                "Initialize the RBAC system. Creates the singleton state PDA",
+                "and sets the caller as the super admin."
+            ],
+            "discriminator": [
+                175,
+                175,
+                109,
+                31,
+                13,
+                152,
+                155,
+                237
+            ],
+            "accounts": [
+                {
+                    "name": "rbac_state",
+                    "writable": true,
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [
+                                    114,
+                                    98,
+                                    97,
+                                    99,
+                                    95,
+                                    115,
+                                    116,
+                                    97,
+                                    116,
+                                    101
+                                ]
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "authority",
+                    "writable": true,
+                    "signer": true
+                },
+                {
+                    "name": "system_program",
+                    "address": "11111111111111111111111111111111"
+                }
+            ],
+            "args": []
+        },
+        {
+            "name": "remove_permission",
+            "docs": [
+                "Remove a permission by closing its PDA account.",
+                "Only callable by the super admin."
+            ],
+            "discriminator": [
+                122,
+                51,
+                186,
+                238,
+                78,
+                104,
+                205,
+                204
+            ],
+            "accounts": [
+                {
+                    "name": "rbac_state",
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [
+                                    114,
+                                    98,
+                                    97,
+                                    99,
+                                    95,
+                                    115,
+                                    116,
+                                    97,
+                                    116,
+                                    101
+                                ]
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "permission",
+                    "writable": true,
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [
+                                    112,
+                                    101,
+                                    114,
+                                    109,
+                                    105,
+                                    115,
+                                    115,
+                                    105,
+                                    111,
+                                    110
+                                ]
+                            },
+                            {
+                                "kind": "account",
+                                "path": "permission.name",
+                                "account": "Permission"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "authority",
+                    "writable": true,
+                    "signer": true
+                },
+                {
+                    "name": "system_program",
+                    "address": "11111111111111111111111111111111"
+                }
+            ],
+            "args": []
+        },
+        {
+            "name": "remove_role",
+            "docs": [
+                "Remove a role by closing its PDA account.",
+                "Only callable by the super admin."
+            ],
+            "discriminator": [
+                74,
+                69,
+                168,
+                163,
+                248,
+                3,
+                130,
+                0
+            ],
+            "accounts": [
+                {
+                    "name": "rbac_state",
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [
+                                    114,
+                                    98,
+                                    97,
+                                    99,
+                                    95,
+                                    115,
+                                    116,
+                                    97,
+                                    116,
+                                    101
+                                ]
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "role",
+                    "writable": true,
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [
+                                    114,
+                                    111,
+                                    108,
+                                    101
+                                ]
+                            },
+                            {
+                                "kind": "account",
+                                "path": "role.name",
+                                "account": "Role"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "authority",
+                    "writable": true,
+                    "signer": true
+                },
+                {
+                    "name": "system_program",
+                    "address": "11111111111111111111111111111111"
+                }
+            ],
+            "args": []
+        },
+        {
+            "name": "revoke_permission_from_role",
+            "docs": [
+                "Revoke a permission from a role by closing the junction PDA.",
+                "Only callable by the super admin."
+            ],
+            "discriminator": [
+                37,
+                123,
+                68,
+                182,
+                2,
+                116,
+                77,
+                147
+            ],
+            "accounts": [
+                {
+                    "name": "rbac_state",
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [
+                                    114,
+                                    98,
+                                    97,
+                                    99,
+                                    95,
+                                    115,
+                                    116,
+                                    97,
+                                    116,
+                                    101
+                                ]
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "role",
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [
+                                    114,
+                                    111,
+                                    108,
+                                    101
+                                ]
+                            },
+                            {
+                                "kind": "account",
+                                "path": "role.name",
+                                "account": "Role"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "permission",
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [
+                                    112,
+                                    101,
+                                    114,
+                                    109,
+                                    105,
+                                    115,
+                                    115,
+                                    105,
+                                    111,
+                                    110
+                                ]
+                            },
+                            {
+                                "kind": "account",
+                                "path": "permission.name",
+                                "account": "Permission"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "role_permission",
+                    "writable": true,
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [
+                                    114,
+                                    111,
+                                    108,
+                                    101,
+                                    95,
+                                    112,
+                                    101,
+                                    114,
+                                    109,
+                                    105,
+                                    115,
+                                    115,
+                                    105,
+                                    111,
+                                    110
+                                ]
+                            },
+                            {
+                                "kind": "account",
+                                "path": "role"
+                            },
+                            {
+                                "kind": "account",
+                                "path": "permission"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "authority",
+                    "writable": true,
+                    "signer": true
+                },
+                {
+                    "name": "system_program",
+                    "address": "11111111111111111111111111111111"
+                }
+            ],
+            "args": []
+        },
+        {
+            "name": "revoke_role_from_user",
+            "docs": [
+                "Revoke a role from a user by closing the junction PDA.",
+                "Only callable by the super admin."
+            ],
+            "discriminator": [
+                184,
+                233,
+                178,
+                200,
+                157,
+                180,
+                135,
+                154
+            ],
+            "accounts": [
+                {
+                    "name": "rbac_state",
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [
+                                    114,
+                                    98,
+                                    97,
+                                    99,
+                                    95,
+                                    115,
+                                    116,
+                                    97,
+                                    116,
+                                    101
+                                ]
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "role",
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [
+                                    114,
+                                    111,
+                                    108,
+                                    101
+                                ]
+                            },
+                            {
+                                "kind": "account",
+                                "path": "role.name",
+                                "account": "Role"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "user"
+                },
+                {
+                    "name": "user_role",
+                    "writable": true,
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [
+                                    117,
+                                    115,
+                                    101,
+                                    114,
+                                    95,
+                                    114,
+                                    111,
+                                    108,
+                                    101
+                                ]
+                            },
+                            {
+                                "kind": "account",
+                                "path": "user"
+                            },
+                            {
+                                "kind": "account",
+                                "path": "role"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "authority",
+                    "writable": true,
+                    "signer": true
+                },
+                {
+                    "name": "system_program",
+                    "address": "11111111111111111111111111111111"
+                }
+            ],
+            "args": []
+        },
+        {
+            "name": "transfer_super_admin",
+            "docs": [
+                "Transfer super admin authority to a new public key.",
+                "Only callable by the current super admin."
+            ],
+            "discriminator": [
+                159,
+                112,
+                0,
+                168,
+                122,
+                135,
+                31,
+                3
+            ],
+            "accounts": [
+                {
+                    "name": "rbac_state",
+                    "writable": true,
+                    "pda": {
+                        "seeds": [
+                            {
+                                "kind": "const",
+                                "value": [
+                                    114,
+                                    98,
+                                    97,
+                                    99,
+                                    95,
+                                    115,
+                                    116,
+                                    97,
+                                    116,
+                                    101
+                                ]
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "authority",
+                    "writable": true,
+                    "signer": true
+                },
+                {
+                    "name": "new_admin",
+                    "docs": [
+                        "unilaterally transfers ownership."
+                    ]
+                }
+            ],
+            "args": []
+        }
+    ],
+    "accounts": [
+        {
+            "name": "Permission",
+            "discriminator": [
+                224,
+                83,
+                28,
+                79,
+                10,
+                253,
+                161,
+                28
+            ]
+        },
+        {
+            "name": "RbacState",
+            "discriminator": [
+                69,
+                75,
+                3,
+                195,
+                160,
+                229,
+                253,
+                114
+            ]
+        },
+        {
+            "name": "Role",
+            "discriminator": [
+                46,
+                219,
+                197,
+                24,
+                233,
+                249,
+                253,
+                154
+            ]
+        },
+        {
+            "name": "RolePermission",
+            "discriminator": [
+                41,
+                223,
+                214,
+                74,
+                223,
+                227,
+                184,
+                209
+            ]
+        },
+        {
+            "name": "UserRole",
+            "discriminator": [
+                62,
+                252,
+                194,
+                137,
+                183,
+                165,
+                147,
+                28
+            ]
+        }
+    ],
+    "events": [
+        {
+            "name": "AccessCheckResult",
+            "discriminator": [
+                6,
+                209,
+                13,
+                85,
+                171,
+                50,
+                200,
+                207
+            ]
+        },
+        {
+            "name": "PermissionAssigned",
+            "discriminator": [
+                94,
+                30,
+                178,
+                158,
+                106,
+                150,
+                25,
+                234
+            ]
+        },
+        {
+            "name": "PermissionCreated",
+            "discriminator": [
+                250,
+                94,
+                2,
+                227,
+                146,
+                101,
+                243,
+                188
+            ]
+        },
+        {
+            "name": "PermissionRemoved",
+            "discriminator": [
+                29,
+                113,
+                171,
+                136,
+                201,
+                210,
+                145,
+                239
+            ]
+        },
+        {
+            "name": "PermissionRevoked",
+            "discriminator": [
+                190,
+                222,
+                94,
+                140,
+                253,
+                138,
+                31,
+                172
+            ]
+        },
+        {
+            "name": "RbacInitialized",
+            "discriminator": [
+                130,
+                5,
+                250,
+                31,
+                57,
+                217,
+                172,
+                130
+            ]
+        },
+        {
+            "name": "RoleAssigned",
+            "discriminator": [
+                15,
+                207,
+                225,
+                171,
+                169,
+                117,
+                98,
+                131
+            ]
+        },
+        {
+            "name": "RoleCreated",
+            "discriminator": [
+                203,
+                8,
+                94,
+                252,
+                142,
+                13,
+                51,
+                221
+            ]
+        },
+        {
+            "name": "RoleRemoved",
+            "discriminator": [
+                133,
+                35,
+                214,
+                234,
+                203,
+                157,
+                203,
+                53
+            ]
+        },
+        {
+            "name": "RoleRevoked",
+            "discriminator": [
+                167,
+                183,
+                52,
+                229,
+                126,
+                206,
+                62,
+                61
+            ]
+        },
+        {
+            "name": "SuperAdminTransferred",
+            "discriminator": [
+                10,
+                206,
+                215,
+                214,
+                185,
+                139,
+                69,
+                184
+            ]
+        }
+    ],
+    "errors": [
+        {
+            "code": 6000,
+            "name": "Unauthorized",
+            "msg": "Only the super admin can perform this action"
+        },
+        {
+            "code": 6001,
+            "name": "NameTooLong",
+            "msg": "Name exceeds the maximum allowed length of 32 characters"
+        },
+        {
+            "code": 6002,
+            "name": "ResourceTooLong",
+            "msg": "Resource name exceeds the maximum allowed length of 32 characters"
+        },
+        {
+            "code": 6003,
+            "name": "ActionTooLong",
+            "msg": "Action name exceeds the maximum allowed length of 32 characters"
+        },
+        {
+            "code": 6004,
+            "name": "AccessDenied",
+            "msg": "Access denied: user does not have the required permission"
+        },
+        {
+            "code": 6005,
+            "name": "AlreadyInitialized",
+            "msg": "The RBAC system has already been initialized"
+        }
+    ],
+    "types": [
+        {
+            "name": "AccessCheckResult",
+            "type": {
+                "kind": "struct",
+                "fields": [
+                    {
+                        "name": "user",
+                        "type": "pubkey"
+                    },
+                    {
+                        "name": "permission",
+                        "type": "pubkey"
+                    },
+                    {
+                        "name": "permission_name",
+                        "type": "string"
+                    },
+                    {
+                        "name": "allowed",
+                        "type": "bool"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Permission",
+            "docs": [
+                "A named permission in the RBAC system (e.g. \"read_medical_record\")."
+            ],
+            "type": {
+                "kind": "struct",
+                "fields": [
+                    {
+                        "name": "name",
+                        "docs": [
+                            "Human-readable permission name."
+                        ],
+                        "type": "string"
+                    },
+                    {
+                        "name": "resource",
+                        "docs": [
+                            "The resource this permission applies to (e.g. \"medical_record\")."
+                        ],
+                        "type": "string"
+                    },
+                    {
+                        "name": "action",
+                        "docs": [
+                            "The action allowed (e.g. \"read\", \"write\")."
+                        ],
+                        "type": "string"
+                    },
+                    {
+                        "name": "created_at",
+                        "docs": [
+                            "Unix timestamp when this permission was created."
+                        ],
+                        "type": "i64"
+                    },
+                    {
+                        "name": "bump",
+                        "docs": [
+                            "PDA bump."
+                        ],
+                        "type": "u8"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "PermissionAssigned",
+            "type": {
+                "kind": "struct",
+                "fields": [
+                    {
+                        "name": "role",
+                        "type": "pubkey"
+                    },
+                    {
+                        "name": "permission",
+                        "type": "pubkey"
+                    },
+                    {
+                        "name": "role_name",
+                        "type": "string"
+                    },
+                    {
+                        "name": "permission_name",
+                        "type": "string"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "PermissionCreated",
+            "type": {
+                "kind": "struct",
+                "fields": [
+                    {
+                        "name": "permission",
+                        "type": "pubkey"
+                    },
+                    {
+                        "name": "name",
+                        "type": "string"
+                    },
+                    {
+                        "name": "resource",
+                        "type": "string"
+                    },
+                    {
+                        "name": "action",
+                        "type": "string"
+                    },
+                    {
+                        "name": "authority",
+                        "type": "pubkey"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "PermissionRemoved",
+            "type": {
+                "kind": "struct",
+                "fields": [
+                    {
+                        "name": "permission",
+                        "type": "pubkey"
+                    },
+                    {
+                        "name": "name",
+                        "type": "string"
+                    },
+                    {
+                        "name": "authority",
+                        "type": "pubkey"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "PermissionRevoked",
+            "type": {
+                "kind": "struct",
+                "fields": [
+                    {
+                        "name": "role",
+                        "type": "pubkey"
+                    },
+                    {
+                        "name": "permission",
+                        "type": "pubkey"
+                    },
+                    {
+                        "name": "role_name",
+                        "type": "string"
+                    },
+                    {
+                        "name": "permission_name",
+                        "type": "string"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "RbacInitialized",
+            "type": {
+                "kind": "struct",
+                "fields": [
+                    {
+                        "name": "super_admin",
+                        "type": "pubkey"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "RbacState",
+            "docs": [
+                "Singleton root state for the RBAC system.",
+                "Stores the super-admin authority and aggregate counters."
+            ],
+            "type": {
+                "kind": "struct",
+                "fields": [
+                    {
+                        "name": "super_admin",
+                        "docs": [
+                            "The authority who can create/manage roles and permissions."
+                        ],
+                        "type": "pubkey"
+                    },
+                    {
+                        "name": "total_roles",
+                        "docs": [
+                            "Total number of roles created (monotonic counter, never decremented)."
+                        ],
+                        "type": "u64"
+                    },
+                    {
+                        "name": "total_permissions",
+                        "docs": [
+                            "Total number of permissions created (monotonic counter)."
+                        ],
+                        "type": "u64"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Role",
+            "docs": [
+                "A named role in the RBAC system (e.g. \"doctor\", \"nurse\")."
+            ],
+            "type": {
+                "kind": "struct",
+                "fields": [
+                    {
+                        "name": "name",
+                        "docs": [
+                            "Human-readable name, max 32 bytes."
+                        ],
+                        "type": "string"
+                    },
+                    {
+                        "name": "created_at",
+                        "docs": [
+                            "Unix timestamp when this role was created."
+                        ],
+                        "type": "i64"
+                    },
+                    {
+                        "name": "bump",
+                        "docs": [
+                            "PDA bump."
+                        ],
+                        "type": "u8"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "RoleAssigned",
+            "type": {
+                "kind": "struct",
+                "fields": [
+                    {
+                        "name": "user",
+                        "type": "pubkey"
+                    },
+                    {
+                        "name": "role",
+                        "type": "pubkey"
+                    },
+                    {
+                        "name": "role_name",
+                        "type": "string"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "RoleCreated",
+            "type": {
+                "kind": "struct",
+                "fields": [
+                    {
+                        "name": "role",
+                        "type": "pubkey"
+                    },
+                    {
+                        "name": "name",
+                        "type": "string"
+                    },
+                    {
+                        "name": "authority",
+                        "type": "pubkey"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "RolePermission",
+            "docs": [
+                "Junction account linking a role → permission assignment."
+            ],
+            "type": {
+                "kind": "struct",
+                "fields": [
+                    {
+                        "name": "role",
+                        "docs": [
+                            "The role PDA public key."
+                        ],
+                        "type": "pubkey"
+                    },
+                    {
+                        "name": "permission",
+                        "docs": [
+                            "The permission PDA public key."
+                        ],
+                        "type": "pubkey"
+                    },
+                    {
+                        "name": "assigned_at",
+                        "docs": [
+                            "Unix timestamp when this assignment was made."
+                        ],
+                        "type": "i64"
+                    },
+                    {
+                        "name": "bump",
+                        "docs": [
+                            "PDA bump."
+                        ],
+                        "type": "u8"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "RoleRemoved",
+            "type": {
+                "kind": "struct",
+                "fields": [
+                    {
+                        "name": "role",
+                        "type": "pubkey"
+                    },
+                    {
+                        "name": "name",
+                        "type": "string"
+                    },
+                    {
+                        "name": "authority",
+                        "type": "pubkey"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "RoleRevoked",
+            "type": {
+                "kind": "struct",
+                "fields": [
+                    {
+                        "name": "user",
+                        "type": "pubkey"
+                    },
+                    {
+                        "name": "role",
+                        "type": "pubkey"
+                    },
+                    {
+                        "name": "role_name",
+                        "type": "string"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "SuperAdminTransferred",
+            "type": {
+                "kind": "struct",
+                "fields": [
+                    {
+                        "name": "old_admin",
+                        "type": "pubkey"
+                    },
+                    {
+                        "name": "new_admin",
+                        "type": "pubkey"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UserRole",
+            "docs": [
+                "Junction account linking a user → role assignment."
+            ],
+            "type": {
+                "kind": "struct",
+                "fields": [
+                    {
+                        "name": "user",
+                        "docs": [
+                            "The user's public key."
+                        ],
+                        "type": "pubkey"
+                    },
+                    {
+                        "name": "role",
+                        "docs": [
+                            "The role PDA public key."
+                        ],
+                        "type": "pubkey"
+                    },
+                    {
+                        "name": "assigned_at",
+                        "docs": [
+                            "Unix timestamp when this assignment was made."
+                        ],
+                        "type": "i64"
+                    },
+                    {
+                        "name": "bump",
+                        "docs": [
+                            "PDA bump."
+                        ],
+                        "type": "u8"
+                    }
+                ]
+            }
+        }
+    ]
+}

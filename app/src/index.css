@@ -1,0 +1,89 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+  --bg-primary: #09090b;
+  --bg-secondary: #0c0c0f;
+  --bg-card: #111114;
+  --bg-card-elevated: #16161a;
+  --bg-input: #0a0a0d;
+  --bg-hover: #1a1a1f;
+  --border: #1e1e24;
+  --border-subtle: #151518;
+  --border-active: #7c3aed;
+  --text-primary: #fafafa;
+  --text-secondary: #a1a1aa;
+  --text-muted: #52525b;
+  --accent: #7c3aed;
+  --accent-hover: #8b5cf6;
+  --accent-dim: rgba(124, 58, 237, 0.12);
+  --accent-glow: rgba(124, 58, 237, 0.25);
+  --success: #22c55e;
+  --success-dim: rgba(34, 197, 94, 0.08);
+  --success-border: rgba(34, 197, 94, 0.2);
+  --danger: #ef4444;
+  --danger-dim: rgba(239, 68, 68, 0.08);
+  --danger-border: rgba(239, 68, 68, 0.2);
+  --warning: #eab308;
+  --warning-dim: rgba(234, 179, 8, 0.08);
+  --info: #3b82f6;
+  --info-dim: rgba(59, 130, 246, 0.08);
+}
+
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+}
+
+#root {
+  min-height: 100vh;
+}
+
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* Wallet Adapter Overrides */
+.wallet-adapter-button {
+  font-family: 'Inter', sans-serif !important;
+  border-radius: 0 !important;
+  font-weight: 600 !important;
+  font-size: 0.8rem !important;
+  height: 36px !important;
+  letter-spacing: 0.01em !important;
+  text-transform: uppercase !important;
+  background: var(--accent) !important;
+}
+
+.wallet-adapter-button:hover {
+  background: var(--accent-hover) !important;
+}
+
+.wallet-adapter-modal-wrapper {
+  font-family: 'Inter', sans-serif !important;
+}
