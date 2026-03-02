@@ -10,19 +10,17 @@ interface UserRoleEntry {
     roleKey: PublicKey;
 }
 
-interface Role {
-    publicKey: PublicKey;
-    name: string;
-}
+interface Role { publicKey: PublicKey; name: string; }
 
 interface Props {
     program: any;
     userRoles: UserRoleEntry[];
     roles: Role[];
     onRefresh: () => void;
+    onTx: (title: string, sig?: string, success?: boolean) => void;
 }
 
-export default function UserRoleManager({ program, userRoles, roles, onRefresh }: Props) {
+export default function UserRoleManager({ program, userRoles, roles, onRefresh, onTx }: Props) {
     const { publicKey } = useWallet();
     const [userAddress, setUserAddress] = useState('');
     const [selectedRole, setSelectedRole] = useState('');
@@ -36,7 +34,7 @@ export default function UserRoleManager({ program, userRoles, roles, onRefresh }
             const userPk = new PublicKey(userAddress.trim());
             const role = roles.find(r => r.name === selectedRole);
             if (!role) throw new Error('Role not found');
-            await program.methods
+            const sig = await program.methods
                 .assignRoleToUser()
                 .accountsPartial({
                     role: role.publicKey,
@@ -44,10 +42,13 @@ export default function UserRoleManager({ program, userRoles, roles, onRefresh }
                     authority: publicKey,
                 })
                 .rpc();
+            onTx(`"${selectedRole}" assigned to user`, sig, true);
             setUserAddress(''); setSelectedRole('');
             onRefresh();
         } catch (err: any) {
-            setError(err?.message?.slice(0, 120) || 'Transaction failed');
+            const msg = err?.message?.slice(0, 120) || 'Transaction failed';
+            setError(msg);
+            onTx(`Failed to assign role`, err?.signature, false);
         } finally {
             setLoading(false);
         }
@@ -57,7 +58,7 @@ export default function UserRoleManager({ program, userRoles, roles, onRefresh }
         if (!program || !publicKey) return;
         setLoading(true); setError('');
         try {
-            await program.methods
+            const sig = await program.methods
                 .revokeRoleFromUser()
                 .accountsPartial({
                     role: ur.roleKey,
@@ -65,9 +66,12 @@ export default function UserRoleManager({ program, userRoles, roles, onRefresh }
                     authority: publicKey,
                 })
                 .rpc();
+            onTx(`"${ur.roleName}" revoked from user`, sig, true);
             onRefresh();
         } catch (err: any) {
-            setError(err?.message?.slice(0, 120) || 'Transaction failed');
+            const msg = err?.message?.slice(0, 120) || 'Transaction failed';
+            setError(msg);
+            onTx(`Failed to revoke role`, err?.signature, false);
         } finally {
             setLoading(false);
         }
@@ -87,12 +91,7 @@ export default function UserRoleManager({ program, userRoles, roles, onRefresh }
             <div className="form-row">
                 <div className="form-group" style={{ flex: 2 }}>
                     <label className="form-label">User Public Key</label>
-                    <input
-                        className="form-input form-input-mono"
-                        placeholder="User wallet address"
-                        value={userAddress}
-                        onChange={e => setUserAddress(e.target.value)}
-                    />
+                    <input className="form-input form-input-mono" placeholder="User wallet address" value={userAddress} onChange={e => setUserAddress(e.target.value)} />
                 </div>
                 <div className="form-group">
                     <label className="form-label">Role</label>
@@ -125,9 +124,7 @@ export default function UserRoleManager({ program, userRoles, roles, onRefresh }
                                     />
                                 </div>
                                 <div className="item-meta">
-                                    <span className="item-meta-entry" style={{ color: 'var(--accent-hover)' }}>
-                                        {ur.roleName}
-                                    </span>
+                                    <span className="item-meta-entry" style={{ color: 'var(--accent-hover)' }}>{ur.roleName}</span>
                                 </div>
                             </div>
                             <div className="item-actions">

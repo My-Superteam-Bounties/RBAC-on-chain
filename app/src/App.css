@@ -558,10 +558,118 @@
   .app-header {
     flex-direction: column;
     gap: 12px;
+    align-items: flex-start;
   }
 
+  .app-header>div:last-child {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  /* State bar stacks vertically */
   .state-bar {
-    flex-wrap: wrap;
+    flex-direction: column;
+  }
+
+  .state-bar-item {
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    width: 100%;
+    justify-content: space-between;
+    padding: 10px 16px;
+  }
+
+  .state-bar-item:last-child {
+    border-bottom: none;
+  }
+
+  .init-button {
+    margin-left: 0;
+    width: 100%;
+    padding: 8px 16px;
+  }
+
+  .init-button .btn {
+    width: 100%;
+  }
+
+  /* Tabs scroll horizontally */
+  .tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .tab {
+    padding: 10px 14px;
+    font-size: 0.7rem;
+    flex-shrink: 0;
+  }
+
+  /* Panel padding tighter */
+  .panel {
+    padding: 16px;
+  }
+
+  /* Full-width buttons in forms */
+  .form-row>div:last-child {
+    width: 100%;
+  }
+
+  .form-row>div:last-child .btn {
+    width: 100%;
+  }
+
+  /* Access matrix scrolls */
+  .access-matrix {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .access-matrix th,
+  .access-matrix td {
+    padding: 8px 10px;
+    font-size: 0.7rem;
+    white-space: nowrap;
+  }
+
+  /* Hospital banner stacks */
+  .hospital-banner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 14px 16px;
+  }
+
+  /* Connect prompt tighter */
+  .connect-prompt {
+    min-height: 50vh;
+    padding: 20px;
+  }
+
+  .connect-prompt h2 {
+    font-size: 1.1rem;
+  }
+
+  .connect-prompt p {
+    font-size: 0.8rem;
+  }
+
+  /* Item cards stack actions below */
+  .item-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 12px;
+  }
+
+  .item-actions {
+    align-self: flex-end;
   }
 }
 
@@ -683,4 +791,142 @@
   width: 14px;
   height: 14px;
   flex-shrink: 0;
+}
+
+/* ── Transaction Links ──────────────────────────────────────── */
+
+.tx-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.15s ease;
+  font-family: 'Inter', sans-serif;
+}
+
+.tx-link svg {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+}
+
+.tx-link-sig {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  font-weight: 500;
+  opacity: 0.7;
+}
+
+.tx-link-success {
+  background: var(--success-dim);
+  border: 1px solid var(--success-border);
+  color: var(--success);
+}
+
+.tx-link-success:hover {
+  background: rgba(34, 197, 94, 0.15);
+}
+
+.tx-link-failed {
+  background: var(--danger-dim);
+  border: 1px solid var(--danger-border);
+  color: var(--danger);
+}
+
+.tx-link-failed:hover {
+  background: rgba(239, 68, 68, 0.15);
+}
+
+/* Tx toast — floating notification */
+
+.tx-toast-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 360px;
+}
+
+.tx-toast {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: var(--bg-card-elevated);
+  border: 1px solid var(--border);
+  animation: slideIn 0.25s ease;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.tx-toast-icon {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+}
+
+.tx-toast-icon.success {
+  color: var(--success);
+}
+
+.tx-toast-icon.error {
+  color: var(--danger);
+}
+
+.tx-toast-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.tx-toast-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+.tx-toast-body .tx-link {
+  margin-top: 4px;
+}
+
+.tx-toast-close {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.tx-toast-close svg {
+  width: 14px;
+  height: 14px;
+}
+
+.tx-toast-close:hover {
+  color: var(--text-primary);
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .tx-toast-container {
+    left: 12px;
+    right: 12px;
+    max-width: none;
+  }
 }

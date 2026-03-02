@@ -14,9 +14,10 @@ interface Props {
     program: any;
     permissions: Permission[];
     onRefresh: () => void;
+    onTx: (title: string, sig?: string, success?: boolean) => void;
 }
 
-export default function PermissionManager({ program, permissions, onRefresh }: Props) {
+export default function PermissionManager({ program, permissions, onRefresh, onTx }: Props) {
     const { publicKey } = useWallet();
     const [name, setName] = useState('');
     const [resource, setResource] = useState('');
@@ -28,14 +29,17 @@ export default function PermissionManager({ program, permissions, onRefresh }: P
         if (!program || !publicKey || !name.trim() || !resource.trim() || !action.trim()) return;
         setLoading(true); setError('');
         try {
-            await program.methods
+            const sig = await program.methods
                 .createPermission(name.trim(), resource.trim(), action.trim())
                 .accounts({ authority: publicKey })
                 .rpc();
+            onTx(`Permission "${name.trim()}" created`, sig, true);
             setName(''); setResource(''); setAction('');
             onRefresh();
         } catch (err: any) {
-            setError(err?.message?.slice(0, 120) || 'Transaction failed');
+            const msg = err?.message?.slice(0, 120) || 'Transaction failed';
+            setError(msg);
+            onTx(`Failed to create permission`, err?.signature, false);
         } finally {
             setLoading(false);
         }
@@ -49,13 +53,16 @@ export default function PermissionManager({ program, permissions, onRefresh }: P
                 [Buffer.from('permission'), Buffer.from(permName)],
                 program.programId
             );
-            await program.methods
+            const sig = await program.methods
                 .removePermission()
                 .accountsPartial({ permission: permPda, authority: publicKey })
                 .rpc();
+            onTx(`Permission "${permName}" removed`, sig, true);
             onRefresh();
         } catch (err: any) {
-            setError(err?.message?.slice(0, 120) || 'Transaction failed');
+            const msg = err?.message?.slice(0, 120) || 'Transaction failed';
+            setError(msg);
+            onTx(`Failed to remove permission`, err?.signature, false);
         } finally {
             setLoading(false);
         }
@@ -75,42 +82,20 @@ export default function PermissionManager({ program, permissions, onRefresh }: P
             <div className="form-row">
                 <div className="form-group">
                     <label className="form-label">Name</label>
-                    <input
-                        className="form-input"
-                        placeholder="read_medical_record"
-                        value={name}
-                        onChange={e => setName(e.target.value)}
-                        maxLength={32}
-                    />
+                    <input className="form-input" placeholder="read_medical_record" value={name} onChange={e => setName(e.target.value)} maxLength={32} />
                 </div>
                 <div className="form-group">
                     <label className="form-label">Resource</label>
-                    <input
-                        className="form-input"
-                        placeholder="medical_record"
-                        value={resource}
-                        onChange={e => setResource(e.target.value)}
-                        maxLength={32}
-                    />
+                    <input className="form-input" placeholder="medical_record" value={resource} onChange={e => setResource(e.target.value)} maxLength={32} />
                 </div>
                 <div className="form-group">
                     <label className="form-label">Action</label>
-                    <input
-                        className="form-input"
-                        placeholder="read"
-                        value={action}
-                        onChange={e => setAction(e.target.value)}
-                        maxLength={32}
-                    />
+                    <input className="form-input" placeholder="read" value={action} onChange={e => setAction(e.target.value)} maxLength={32} />
                 </div>
             </div>
 
             <div style={{ marginBottom: 20 }}>
-                <button
-                    className="btn btn-primary"
-                    onClick={handleCreate}
-                    disabled={loading || !name.trim() || !resource.trim() || !action.trim()}
-                >
+                <button className="btn btn-primary" onClick={handleCreate} disabled={loading || !name.trim() || !resource.trim() || !action.trim()}>
                     {loading ? <span className="spinner" /> : <><Plus /> Create Permission</>}
                 </button>
             </div>

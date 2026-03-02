@@ -13,9 +13,10 @@ interface Props {
     program: any;
     roles: Role[];
     onRefresh: () => void;
+    onTx: (title: string, sig?: string, success?: boolean) => void;
 }
 
-export default function RoleManager({ program, roles, onRefresh }: Props) {
+export default function RoleManager({ program, roles, onRefresh, onTx }: Props) {
     const { publicKey } = useWallet();
     const [name, setName] = useState('');
     const [loading, setLoading] = useState(false);
@@ -25,14 +26,17 @@ export default function RoleManager({ program, roles, onRefresh }: Props) {
         if (!program || !publicKey || !name.trim()) return;
         setLoading(true); setError('');
         try {
-            await program.methods
+            const sig = await program.methods
                 .createRole(name.trim())
                 .accounts({ authority: publicKey })
                 .rpc();
+            onTx(`Role "${name.trim()}" created`, sig, true);
             setName('');
             onRefresh();
         } catch (err: any) {
-            setError(err?.message?.slice(0, 120) || 'Transaction failed');
+            const msg = err?.message?.slice(0, 120) || 'Transaction failed';
+            setError(msg);
+            onTx(`Failed to create role`, err?.signature, false);
         } finally {
             setLoading(false);
         }
@@ -46,13 +50,16 @@ export default function RoleManager({ program, roles, onRefresh }: Props) {
                 [Buffer.from('role'), Buffer.from(roleName)],
                 program.programId
             );
-            await program.methods
+            const sig = await program.methods
                 .removeRole()
                 .accountsPartial({ role: rolePda, authority: publicKey })
                 .rpc();
+            onTx(`Role "${roleName}" removed`, sig, true);
             onRefresh();
         } catch (err: any) {
-            setError(err?.message?.slice(0, 120) || 'Transaction failed');
+            const msg = err?.message?.slice(0, 120) || 'Transaction failed';
+            setError(msg);
+            onTx(`Failed to remove role`, err?.signature, false);
         } finally {
             setLoading(false);
         }

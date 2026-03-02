@@ -20,9 +20,10 @@ interface Props {
     roles: Role[];
     permissions: Permission[];
     onRefresh: () => void;
+    onTx: (title: string, sig?: string, success?: boolean) => void;
 }
 
-export default function RolePermissionManager({ program, rolePermissions, roles, permissions, onRefresh }: Props) {
+export default function RolePermissionManager({ program, rolePermissions, roles, permissions, onRefresh, onTx }: Props) {
     const { publicKey } = useWallet();
     const [selectedRole, setSelectedRole] = useState('');
     const [selectedPerm, setSelectedPerm] = useState('');
@@ -36,7 +37,7 @@ export default function RolePermissionManager({ program, rolePermissions, roles,
             const role = roles.find(r => r.name === selectedRole);
             const perm = permissions.find(p => p.name === selectedPerm);
             if (!role || !perm) throw new Error('Not found');
-            await program.methods
+            const sig = await program.methods
                 .assignPermissionToRole()
                 .accountsPartial({
                     role: role.publicKey,
@@ -44,10 +45,13 @@ export default function RolePermissionManager({ program, rolePermissions, roles,
                     authority: publicKey,
                 })
                 .rpc();
+            onTx(`"${selectedPerm}" linked to "${selectedRole}"`, sig, true);
             setSelectedRole(''); setSelectedPerm('');
             onRefresh();
         } catch (err: any) {
-            setError(err?.message?.slice(0, 120) || 'Transaction failed');
+            const msg = err?.message?.slice(0, 120) || 'Transaction failed';
+            setError(msg);
+            onTx(`Failed to link permission`, err?.signature, false);
         } finally {
             setLoading(false);
         }
@@ -57,7 +61,7 @@ export default function RolePermissionManager({ program, rolePermissions, roles,
         if (!program || !publicKey) return;
         setLoading(true); setError('');
         try {
-            await program.methods
+            const sig = await program.methods
                 .revokePermissionFromRole()
                 .accountsPartial({
                     role: rp.roleKey,
@@ -65,9 +69,12 @@ export default function RolePermissionManager({ program, rolePermissions, roles,
                     authority: publicKey,
                 })
                 .rpc();
+            onTx(`"${rp.permissionName}" unlinked from "${rp.roleName}"`, sig, true);
             onRefresh();
         } catch (err: any) {
-            setError(err?.message?.slice(0, 120) || 'Transaction failed');
+            const msg = err?.message?.slice(0, 120) || 'Transaction failed';
+            setError(msg);
+            onTx(`Failed to unlink permission`, err?.signature, false);
         } finally {
             setLoading(false);
         }

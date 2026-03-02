@@ -11,6 +11,7 @@ import PermissionManager from './components/PermissionManager';
 import UserRoleManager from './components/UserRoleManager';
 import RolePermissionManager from './components/RolePermissionManager';
 import AccessChecker from './components/AccessChecker';
+import TxToast, { useTxToast } from './components/TxToast';
 import './App.css';
 
 type Tab = 'roles' | 'permissions' | 'assignments' | 'access';
@@ -18,6 +19,7 @@ type Tab = 'roles' | 'permissions' | 'assignments' | 'access';
 function App() {
   const { publicKey, connected } = useWallet();
   const { program, programId } = useRbacProgram();
+  const { toasts, addToast, removeToast } = useTxToast();
 
   const [tab, setTab] = useState<Tab>('roles');
   const [initialized, setInitialized] = useState(false);
@@ -30,6 +32,11 @@ function App() {
   const [permissions, setPermissions] = useState<any[]>([]);
   const [userRoles, setUserRoles] = useState<any[]>([]);
   const [rolePermissions, setRolePermissions] = useState<any[]>([]);
+
+  // ── Tx callback ──────────────────────────────────────────────
+  const handleTx = useCallback((title: string, sig?: string, success = true) => {
+    addToast(title, sig, success);
+  }, [addToast]);
 
   // ── Fetch state ──────────────────────────────────────────────
 
@@ -102,13 +109,15 @@ function App() {
     if (!program || !publicKey) return;
     setLoading(true);
     try {
-      await program.methods
+      const sig = await program.methods
         .initialize()
         .accounts({ authority: publicKey })
         .rpc();
+      handleTx('RBAC System initialized', sig, true);
       await fetchAll();
-    } catch (err) {
+    } catch (err: any) {
       console.error('Init failed:', err);
+      handleTx('Initialization failed', err?.signature, false);
     } finally {
       setLoading(false);
     }
@@ -198,23 +207,26 @@ function App() {
 
       {/* Tab content */}
       {tab === 'roles' && (
-        <RoleManager program={program} roles={roles} onRefresh={fetchAll} />
+        <RoleManager program={program} roles={roles} onRefresh={fetchAll} onTx={handleTx} />
       )}
 
       {tab === 'permissions' && (
-        <PermissionManager program={program} permissions={permissions} onRefresh={fetchAll} />
+        <PermissionManager program={program} permissions={permissions} onRefresh={fetchAll} onTx={handleTx} />
       )}
 
       {tab === 'assignments' && (
         <div className="two-col">
-          <UserRoleManager program={program} userRoles={userRoles} roles={roles} onRefresh={fetchAll} />
-          <RolePermissionManager program={program} rolePermissions={rolePermissions} roles={roles} permissions={permissions} onRefresh={fetchAll} />
+          <UserRoleManager program={program} userRoles={userRoles} roles={roles} onRefresh={fetchAll} onTx={handleTx} />
+          <RolePermissionManager program={program} rolePermissions={rolePermissions} roles={roles} permissions={permissions} onRefresh={fetchAll} onTx={handleTx} />
         </div>
       )}
 
       {tab === 'access' && (
-        <AccessChecker program={program} roles={roles} permissions={permissions} userRoles={userRoles} />
+        <AccessChecker program={program} roles={roles} permissions={permissions} userRoles={userRoles} onTx={handleTx} />
       )}
+
+      {/* Transaction toast notifications */}
+      <TxToast toasts={toasts} onRemove={removeToast} />
     </div>
   );
 }
