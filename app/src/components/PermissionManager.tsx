@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
-import { PublicKey, SystemProgram } from '@solana/web3.js';
+import { PublicKey } from '@solana/web3.js';
 import { KeyRound, Plus, Trash2, AlertCircle, FileText, Zap } from 'lucide-react';
 
 interface Permission {

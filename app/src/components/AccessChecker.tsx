@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useWallet } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
 import { Activity, CheckCircle2, XCircle, Minus, Loader2, Building2 } from 'lucide-react';
 
@@ -17,7 +16,6 @@ interface Props {
 type CellState = 'idle' | 'checking' | 'granted' | 'denied';
 
 export default function AccessChecker({ program, roles, permissions, userRoles }: Props) {
-    const { publicKey } = useWallet();
     const [matrix, setMatrix] = useState<Record<string, CellState>>({});
 
     const cellKey = (user: string, roleName: string, permName: string) =>
